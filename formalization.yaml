@@ -1,0 +1,167 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/v0.4.schema.json
+version: "v0.4"
+
+project:
+  name: "The natural proofs barrier (Razborov and Rudich)"
+  description: >-
+    A Lean 4 proof of Theorem 4.1 of A. A. Razborov and S. Rudich, Natural proofs (1997). If a
+    generator G_k from k bits to 2k bits, computed by circuits of polynomial size, has hardness
+    at least 2^(k^ε) for some ε > 0 and infinitely many k, then no P/poly-natural combinatorial
+    property is useful against P/poly. The proof follows the paper. The generator gives
+    Goldreich–Goldwasser–Micali functions of n variables with polynomial-size circuits, which a
+    useful property must reject. The circuit that decides the large constructive subproperty
+    then tells these functions apart from random functions. A hybrid argument over the levels
+    of the tree and over the nodes of a level, with all other nodes fixed, gives a circuit of
+    size 2^O(n) that tells one output of G_k apart from a uniform string with advantage
+    2^(-O(n)), which contradicts the hardness for n a small power of k.
+  authors:
+    - "Z. Zzyzek (github: zzyzek)"
+  license: "CC0-1.0"
+  responsible_maintainers:
+    - "Z. Zzyzek (github: zzyzek)"
+
+classification:
+  arxiv: ["cs.CC"]
+  msc2020: ["68Q17", "68Q06"]
+
+sources:
+  - title: "Natural proofs"
+    type: article
+    relationship: formalizes
+    authors:
+      - "A. A. Razborov"
+      - "S. Rudich"
+    id: "doi:10.1006/jcss.1997.1494"
+    location: "Journal of Computer and System Sciences 55 (1997), 24–35, Theorem 4.1"
+    author_endorsement: not-contacted
+    note: >-
+      Theorem 4.1 is the registered statement. The definitions of natural and useful properties
+      follow Section 2.1 and Section 2.2, and the hardness of a generator follows Section 4. The
+      proof follows the proof of Theorem 4.1, with the construction of Goldreich, Goldwasser and
+      Micali. Theorems 4.2 and 4.3 (the AC0[2] results), the examples of natural proofs in
+      Section 3 and the formal complexity measures of Section 5 are not formalized.
+  - title: "How to construct random functions"
+    type: article
+    relationship: background
+    authors:
+      - "O. Goldreich"
+      - "S. Goldwasser"
+      - "S. Micali"
+    id: "doi:10.1145/6490.6503"
+    location: "Journal of the ACM 33 (1986), 792–807"
+    author_endorsement: not-contacted
+    note: >-
+      The tree construction of pseudorandom functions from a length-doubling generator, used in
+      the proof of Theorem 4.1 and formalized here (NaturalProofs.prf).
+
+related_formalizations:
+  - id: "https://github.com/crabsatellite/lean4-natural-proofs-barrier"
+    relationship: independent
+    note: >-
+      A Lean 4 development (May 2026). Its hypothesis PRFHypothesis assumes that every
+      constructive and large property accepts some output of the generator at arbitrarily large
+      input lengths, which is the step that the distinguisher argument proves here.
+  - id: "https://github.com/neardws/p-vs-np-lean"
+    relationship: independent
+    note: >-
+      A Lean 4 development (October 2026) that defines natural properties and states the
+      barrier as a proposition parameterized by an undefined notion of PRF security, with the
+      proof pending.
+
+status:
+  scope: >-
+    Formalized and registered: Theorem 4.1 of Razborov and Rudich in the form
+    NaturalProofs.natural_proofs_barrier. For every generator G in P/poly and every ε > 0 such
+    that the hardness of G_k is at least 2^(k^ε) for infinitely many k, there is no property
+    that is P/poly-natural and useful against P/poly. Circuits are Boolean circuits over
+    {¬, ∧, ∨} with fan-in at most two and constants, and size is the number of gates. The
+    statement is about circuits only, so no algorithm and no running time are involved. Not
+    formalized: the corollary from hard functions stated after Theorem 4.1, Theorems 4.2 and
+    4.3, and Sections 3 and 5 of the paper. The cryptographic hypothesis is a hypothesis of the
+    theorem and is not proved (it is an open problem).
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: ["propext", "Classical.choice", "Quot.sound"]
+  main_results:
+    - declaration: "NaturalProofs.natural_proofs_barrier"
+      file: "NaturalProofs/Main.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+
+automation:
+  methods:
+    - method: agent
+      models: ["Claude Opus 5.5"]
+      framework: "Claude Code"
+      tool_setup: >-
+        Claude Code with the Lean toolchain and Python on a local machine. The human posed the
+        problem and steered by review.
+      cost:
+        wall_time: "about 1 hour"
+        spend_usd: "subscription-based"
+        hardware: "local machine (4 cores, 32 GB)"
+      prompting_notes: >-
+        The human asked for a literature review of existing formalizations, then for a complete
+        Lean proof packaged for the Palomar registry.
+  spend_usd: "subscription-based"
+  notes: >-
+    Claude (Opus 5.5) wrote the Lean 4 proof in its entirety and the documentation. The listed
+    author contributed the problem and guidance.
+
+fidelity:
+  divergences: >-
+    A circuit is a list of gates and an output wire. A wire is an input, a constant or a gate
+    number, and a wire that names a gate not yet computed reads false, so every list of gates is
+    a circuit and computes what the circuit with that wire replaced by the constant false
+    computes, with the same size. A Boolean function of n variables is its own truth table: a
+    circuit with inputs indexed by Fin n → Bool reads 2^n bits. Constructivity asks for circuits
+    of size 2^(c n) for all n ≥ n₀ (the paper's P/poly-constructivity, size polynomial in 2^n),
+    and largeness asks for a fraction 2^(-c n) for all n ≥ n₀ (the paper's 2^(-O(n))). Usefulness
+    against P/poly is stated uniformly: for every d, for all large n, every function in C_n has
+    circuit size more than n^d. This is equivalent to the paper's Section 2.2 form (every
+    sequence with f_n ∈ C_n infinitely often is outside P/poly), and to the Section 2.1 form
+    (every sequence with f_n ∈ C_n for all n has super-polynomial size) when every C_n is
+    nonempty. The Section 2.1 form read literally holds vacuously when some C_n is empty. With
+    it, the property of all functions of at least one variable would be natural and useful, and
+    the theorem would fail whenever a generator meeting its hypothesis exists. A generator in P/poly has a circuit of size k^c + c for each
+    output bit. The hypothesis of the theorem is the negation of the paper's "H(G_k) ≤
+    2^(k^o(1)) for every generator in P/poly": some generator in P/poly and some ε > 0 with
+    H(G_k) ≥ 2^(k^ε) for infinitely many k. Hardness follows the paper's definition (the least
+    S such that a circuit of size at most S has advantage at least 1/S), stated as a lower
+    bound on S with probabilities as counts over the uniform distribution.
+
+review:
+  status: "self-assessed"
+  reviewers:
+    - "none"
+  notes: >-
+    The kernel checks the proof, which uses only propext, Classical.choice and Quot.sound. The
+    local comparator run (lake comparator --paranoid) accepted the solution with the Lean,
+    lean4lean, nanoda, con-leche and con-ron kernels. The statement and its definitions were
+    compared by the agent with the text of the paper. NaturalProofs/Sanity.lean shows that the
+    property of all functions is natural, that the empty property is useful against P/poly,
+    and that the all-zero generator has hardness below 3. Independent mathematical review has
+    not taken place.
+
+alignment:
+  namespace: "NaturalProofs"
+  statements:
+    - source: "Theorem 4.1"
+      lean: "NaturalProofs.natural_proofs_barrier"
+      module: "NaturalProofs.Main"
+      status: "proved"
+    - source: "Section 2.1, natural property (P/poly-constructivity, largeness)"
+      lean: "NaturalProofs.IsNatural"
+      module: "NaturalProofs.Defs"
+      status: "defined"
+    - source: "Section 2.1 and 2.2, usefulness against P/poly"
+      lean: "NaturalProofs.UsefulAgainstPPoly"
+      module: "NaturalProofs.Defs"
+      status: "defined"
+    - source: "Section 4, hardness H(G_k)"
+      lean: "NaturalProofs.HardnessAtLeast"
+      module: "NaturalProofs.Defs"
+      status: "defined"
+
+acknowledgements: "Lean 4 and Mathlib."
